@@ -27,11 +27,33 @@ class CurveDataTransform:
         for input_index, output_index, value in operations:
             transfrom._transform_matrix[input_index, output_index] = value
         return transfrom
+    
+    @classmethod
+    def load_from_npz(self, npz_file):
+        data = np.load(npz_file)
+        print("!1!!", len(data["output_curve_names"]))
+        transfrom = self(data["input_curve_names"], data["output_curve_names"])
+        if transfrom._transform_matrix.shape == data["transform_matrix"].shape:
+            transfrom._transform_matrix = data["transform_matrix"]
+        return transfrom
+
+    @property
+    def input_curve_names(self):
+        return self._input_curve_names
+    
+    @property
+    def output_curve_names(self):
+        return self._output_curve_names
+    
+    @property
+    def is_valid(self):
+        return len(self._input_curve_names)!=0 and len(self._output_curve_names)!=0 and np.sum(self._transform_matrix)!=0
 
     def apply(self, curves):
-        data_len = curves.data_len()
+        data_len = curves.data_len
         input_curves = CurveData(data_len, self._input_curve_names)
         input_curves.update_curves(curves)
+        input_curves.update_curve('bias', np.ones((data_len,), dtype=float))
 
         output_curves = CurveData(data_len, self._output_curve_names)
         output_curves._curve_data = input_curves._curve_data.dot(self._transform_matrix)
