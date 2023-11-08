@@ -50,12 +50,12 @@ class CurveDataTransform:
         return len(self._input_curve_names)!=0 and len(self._output_curve_names)!=0 and np.sum(self._transform_matrix)!=0
 
     def apply(self, curves):
-        data_len = curves.data_len
-        input_curves = CurveData(data_len, self._input_curve_names)
+        frame_num = curves.frame_num
+        input_curves = CurveData(frame_num=frame_num, curve_names=self._input_curve_names)
         input_curves.update_curves(curves)
-        input_curves.update_curve('bias', np.ones((data_len,), dtype=float))
+        input_curves.update_curve(name='bias', data=np.ones((frame_num,), dtype=float))
 
-        output_curves = CurveData(data_len, self._output_curve_names)
+        output_curves = CurveData(frame_num=frame_num, curve_names=self._output_curve_names)
         output_curves._curve_data = input_curves._curve_data.dot(self._transform_matrix)
 
         return output_curves

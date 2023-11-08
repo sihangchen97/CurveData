@@ -10,10 +10,16 @@ def str2float(v):
     try:
         return float(v)
     except:
-        try:
-            return float(int(v))
-        except:
-            return 0.0
+        pass
+    try:
+        return float(int(v))
+    except:
+        pass
+    try:
+        return float(bool(v))
+    except:
+        pass
+    return 0.0
 
 def in_maya():
     try:
